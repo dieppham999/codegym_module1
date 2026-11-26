@@ -1,0 +1,71 @@
+ORION RADAR RECOVERY - BÁO CÁO XỬ LÝ LỖI
+==========================================
+
+1. NGUYÊN NHÂN LỖI TRONG LEGACY CODE
+------------------------------------
+- Truy cập thuộc tính x của phần tử null/undefined -> TypeError, làm dừng toàn bộ vòng render.
+- Không kiểm tra API trả về mảng -> gọi forEach/map trên null hoặc chuỗi gây TypeError.
+- Tọa độ NaN/Infinity/chuỗi không gây ngoại lệ trong arc() nhưng vẽ sai hoặc không vẽ -> lỗi "im lặng".
+- try...catch đặt bên ngoài vòng lặp -> một phần tử lỗi làm bỏ qua toàn bộ phần tử còn lại.
+
+2. GIẢI PHÁP
+------------
+- cleanData(raw): nếu raw không phải mảng -> console.warn, trả về danh sách rỗng.
+- Mỗi phần tử được kiểm tra trong try...catch RIÊNG (bên trong forEach):
+    + phải là object, không null, không phải mảng
+    + id là string hoặc number
+    + có đủ x và y
+    + x, y là number hữu hạn (Number.isFinite) -> loại NaN, Infinity, null, undefined, chuỗi
+    + nằm trong phạm vi radar
+  Phần tử hỏng bị loại và ghi console.warn kèm lý do và dữ liệu gốc.
+- Vòng loop() của requestAnimationFrame bọc try...catch và luôn gọi requestAnimationFrame
+  ở cuối -> khung hình lỗi không làm dừng radar.
+- drawPlanes() có try...catch riêng cho từng máy bay.
+
+3. DỮ LIỆU KIỂM THỬ LỖI
+-----------------------
+Mảng hỗn hợp 13 phần tử:
+  {id:"A",x:300,y:300}      -> HỢP LỆ
+  null                      -> loại: phần tử không phải object (null)
+  undefined                 -> loại: phần tử không phải object (undefined)
+  {id:"B",x:NaN,y:1}        -> loại: tọa độ không hợp lệ
+  {id:"C",x:1,y:Infinity}   -> loại: tọa độ không hợp lệ
+  {id:"D",x:"300",y:300}    -> loại: sai kiểu (chuỗi)
+  {id:"E",x:300}            -> loại: thiếu tọa độ x/y
+  {x:300,y:300}             -> loại: thiếu hoặc sai kiểu id
+  "X"                       -> loại: không phải object
+  42                        -> loại: không phải object
+  [1,2]                     -> loại: sai cấu trúc (mảng)
+  {id:"F",x:9999,y:300}     -> loại: ngoài phạm vi radar
+  {id:7,x:310,y:290}        -> HỢP LỆ (id số được chuyển thành chuỗi "7")
+
+Dữ liệu API sai cấu trúc: null, undefined, "500 Error", {data:[]}, 404.
+
+Dữ liệu stress: 500 máy bay, mỗi phần tử có xác suất 30% bị làm hỏng ngẫu nhiên
+bằng 1 trong 14 kiểu lỗi (null, undefined, NaN, ±Infinity, chuỗi, thiếu id, thiếu y,
+mảng, số, ngoài phạm vi...).
+
+4. KẾT QUẢ KIỂM THỬ
+-------------------
+4.1. Kiểm thử hàm cleanData bằng Node.js (đã chạy thực tế, 2026-11-26):
+  null              -> hợp lệ 0, không ném lỗi
+  undefined         -> hợp lệ 0, không ném lỗi
+  "500 Error"       -> hợp lệ 0, không ném lỗi
+  {data:[]}         -> hợp lệ 0, không ném lỗi
+  404               -> hợp lệ 0, không ném lỗi
+  Mảng hỗn hợp 13   -> hợp lệ 2 (A, 7), bị loại 11 -> đúng kỳ vọng
+  Stress 100 lượt x 500 máy bay -> trung bình hợp lệ 351.2, bị loại 148.8 (~29.8%),
+                                   số ngoại lệ không xử lý: 0
+
+4.2. Kiểm thử trên trình duyệt (học viên tự chạy và điền kết quả):
+  [ ] Chế độ "Dữ liệu biến động": radar quay liên tục, máy bay di chuyển  -> ......
+  [ ] Chế độ "Stress test 500": radar vẫn chạy, Console có console.warn   -> ......
+  [ ] Chế độ "API trả sai cấu trúc": radar trống nhưng không dừng         -> ......
+  [ ] Click vào máy bay -> chuyển màu đỏ, hiện mã máy bay                 -> ......
+  [ ] Click vào vùng trống -> bỏ chọn                                    -> ......
+  [ ] Thu nhỏ cửa sổ rồi click -> vẫn chọn đúng (kiểm chứng đổi tọa độ)   -> ......
+  [ ] Console không có lỗi đỏ (Uncaught ...)                             -> ......
+
+5. ẢNH MINH CHỨNG
+-----------------
+screenshots/console-warning.png

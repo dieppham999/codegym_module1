@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orion Radar Recovery</title>
+  <style>
+    body { margin: 0; background: #07110c; color: #9fe8b4; font-family: Consolas, monospace; display: flex; flex-direction: column; align-items: center; }
+    h1 { margin: 16px 0 4px; font-size: 22px; letter-spacing: 2px; }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 8px 0; }
+    button { background: #12301f; color: #9fe8b4; border: 1px solid #2e7a4a; padding: 6px 12px; cursor: pointer; font-family: inherit; }
+    button.active { background: #2e7a4a; color: #fff; }
+    /* Kích thước hiển thị khác kích thước nội bộ (600x600) để kiểm chứng phép chuyển tọa độ chuột */
+    canvas { width: min(90vw, 520px); height: min(90vw, 520px); border-radius: 50%; box-shadow: 0 0 24px #1d5c36; cursor: crosshair; }
+    #stats { margin: 10px 0 20px; font-size: 14px; text-align: center; }
+  </style>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <h1>ORION RADAR</h1>
+  <div class="controls">
+    <button type="button" data-mode="dynamic" class="active">Dữ liệu biến động (50)</button>
+    <button type="button" data-mode="stress">Stress test (500, ~30% lỗi)</button>
+    <button type="button" data-mode="broken">API trả sai cấu trúc</button>
+  </div>
+  <canvas id="radar" width="600" height="600"></canvas>
+  <div id="stats">Đang khởi động...</div>
+</body>
+</html>
