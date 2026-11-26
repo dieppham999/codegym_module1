@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BurgerTech – Kiosk đặt món</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>🍔 BurgerTech</h1>
+    <p>Kiosk đặt món tự phục vụ</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Thêm món</h2>
+      <form id="orderForm" novalidate>
+        <label for="foodName">Tên món</label>
+        <input type="text" id="foodName" placeholder="VD: Burger bò phô mai" autocomplete="off">
+
+        <label for="foodPrice">Giá (VNĐ)</label>
+        <input type="number" id="foodPrice" min="1000" step="1000" placeholder="VD: 45000">
+
+        <p id="formError" class="error" role="alert"></p>
+        <button type="submit">Thêm vào giỏ</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Giỏ hàng</h2>
+      <ul id="cartList"></ul>
+      <p id="emptyCart" class="empty">Giỏ hàng đang trống.</p>
+      <p class="total">Tổng tiền: <strong id="totalPrice">0 ₫</strong></p>
+      <button type="button" id="checkoutBtn">Thanh toán</button>
+      <p class="hint">Phím tắt: <kbd>Enter</kbd> thanh toán · <kbd>Esc</kbd> xóa toàn bộ giỏ</p>
+      <p id="message" class="message" role="status"></p>
+    </section>
+  </main>
+</body>
+</html>
