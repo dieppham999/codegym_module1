@@ -1,0 +1,158 @@
+WEATHERSYNC - DEBUG REPORT
+==========================
+
+1. PHÂN TÍCH LEGACY CODE
+------------------------
+Kết quả chạy mã gốc bằng Node.js v24 (2026-11-26):
+
+  --- BẮT ĐẦU XỬ LÝ DỮ LIỆU ---
+  Cảm biến S1: Nhiệt độ là 32.5°C
+  TypeError: Cannot read properties of null (reading 'toFixed')
+      at legacy.js:13:41
+      at Array.forEach (<anonymous>)
+      at processWeatherData (legacy.js:12:14)
+      at Object.<anonymous> (legacy.js:19:1)
+
+Đọc Stack Trace (từ trên xuống):
+  - Dòng đầu: loại lỗi TypeError và thông điệp: đọc thuộc tính 'toFixed' của null.
+  - "legacy.js:13:41": lỗi ở dòng 13, cột 41 -> sensor.temp.toFixed(1).
+  - "Array.forEach" -> "processWeatherData" -> dòng 19: chuỗi lời gọi dẫn tới lỗi.
+  - Object gây lỗi: cảm biến S2 { id: "S2", temp: null, humidity: 90 }.
+  - Chỉ S1 được in; S3, S4, chuỗi hacker, S5 và dòng "HOÀN THÀNH" đều không chạy.
+
+Hai nguyên nhân cốt lõi:
+  (1) Không kiểm tra dữ liệu (validation): gọi .toFixed() khi temp không phải number
+      (null, chuỗi, undefined) và đọc .temp từ phần tử không phải object.
+      Nếu chạy tiếp, phần tử chuỗi "Tôi là hacker..." có sensor.temp = undefined
+      -> TypeError: Cannot read properties of undefined (reading 'toFixed').
+      S4 thiếu humidity nhưng mã gốc không hề kiểm tra nên không phát hiện được.
+  (2) Không xử lý ngoại lệ: không có try...catch, nên một TypeError ném ra trong
+      callback của forEach lan lên tới cấp cao nhất và dừng toàn bộ chương trình.
+
+Phân biệt lỗi:
+  - TypeError: thao tác trên giá trị sai kiểu (gọi phương thức của null/undefined).
+  - ReferenceError: dùng biến chưa khai báo, ví dụ console.log(sensr.id).
+
+2. THIẾT KẾ - MÃ GIẢ
+--------------------
+  HÀM processWeatherData(dataList)
+    IN "--- BẮT ĐẦU XỬ LÝ DỮ LIỆU ---"
+    NẾU dataList không phải mảng: GHI LỖI, IN "HOÀN THÀNH", KẾT THÚC
+    VỚI MỖI sensor, index TRONG dataList:
+      label <- sensor.id nếu đọc được, ngược lại "không xác định (vị trí #index)"
+      THỬ (try):
+        NẾU sensor không phải object thật (null, chuỗi, số, mảng): NÉM ValidationError
+        NẾU thiếu id / temp / humidity:                          NÉM ValidationError
+        NẾU temp không phải number hữu hạn:                      NÉM ValidationError
+        NẾU humidity không phải number hữu hạn hoặc ngoài 0-100: NÉM ValidationError
+        NẾU temp < -50 HOẶC temp > 100:                          NÉM Error (nghiệp vụ)
+        IN "Cảm biến <id>: Nhiệt độ là <temp.toFixed(1)>°C"
+      BẮT (catch error):
+        NẾU ValidationError: console.warn kèm label
+        NGƯỢC LẠI:           console.error kèm label
+      CUỐI CÙNG (finally):
+        IN "Đã quét qua cảm biến <label>"
+    IN "--- HOÀN THÀNH XỬ LÝ DỮ LIỆU ---"
+
+Vị trí try...catch: đặt BÊN TRONG callback của forEach. Nếu bọc ngoài toàn bộ
+vòng lặp, lỗi ở S2 sẽ nhảy thẳng ra catch và S3..S5 vẫn không được xử lý.
+
+Phân loại log:
+  console.log   -> thông tin bình thường (nhiệt độ hợp lệ, đã quét, bắt đầu/hoàn thành)
+  console.warn  -> dữ liệu sai kiểu/thiếu trường (ValidationError)
+  console.error -> lỗi nghiệp vụ vượt ngưỡng và lỗi không lường trước
+
+3. KẾT QUẢ CHẠY SAU REFACTOR (node weather_dashboard.js, 2026-11-26)
+--------------------------------------------------------------------
+  ===== DỮ LIỆU ĐỀ BÀI =====
+  --- BẮT ĐẦU XỬ LÝ DỮ LIỆU ---
+  Cảm biến S1: Nhiệt độ là 32.5°C, độ ẩm 80%
+  Đã quét qua cảm biến S1
+  [CẢNH BÁO] Cảm biến S2: Nhiệt độ không hợp lệ: null (kiểu object)
+  Đã quét qua cảm biến S2
+  Cảm biến S3: Nhiệt độ là 35.1°C, độ ẩm 75%
+  Đã quét qua cảm biến S3
+  [CẢNH BÁO] Cảm biến S4: Thiếu trường bắt buộc: humidity
+  Đã quét qua cảm biến S4
+  [CẢNH BÁO] Cảm biến không xác định (vị trí #4): Dữ liệu không phải object cảm biến (nhận được: string)
+  Đã quét qua cảm biến không xác định (vị trí #4)
+  Cảm biến S5: Nhiệt độ là 28.0°C, độ ẩm 60%
+  Đã quét qua cảm biến S5
+  Tổng kết: 3 hợp lệ, 3 cảnh báo dữ liệu, 0 lỗi nghiệp vụ
+  --- HOÀN THÀNH XỬ LÝ DỮ LIỆU ---
+  
+  ===== DỮ LIỆU EDGE CASES =====
+  --- BẮT ĐẦU XỬ LÝ DỮ LIỆU ---
+  Cảm biến E01: Nhiệt độ là -50.0°C, độ ẩm 40%
+  Đã quét qua cảm biến E01
+  Cảm biến E02: Nhiệt độ là 100.0°C, độ ẩm 10%
+  Đã quét qua cảm biến E02
+  [LỖI] Cảm biến E03: Nhiệt độ -50.1°C vượt ngưỡng an toàn [-50, 100]
+  Đã quét qua cảm biến E03
+  [LỖI] Cảm biến E04: Nhiệt độ 100.5°C vượt ngưỡng an toàn [-50, 100]
+  Đã quét qua cảm biến E04
+  [CẢNH BÁO] Cảm biến E05: Nhiệt độ không hợp lệ: 25.5 (kiểu string)
+  Đã quét qua cảm biến E05
+  [CẢNH BÁO] Cảm biến E06: Nhiệt độ không hợp lệ: undefined (kiểu undefined)
+  Đã quét qua cảm biến E06
+  [CẢNH BÁO] Cảm biến E07: Nhiệt độ không hợp lệ: NaN (kiểu number)
+  Đã quét qua cảm biến E07
+  [CẢNH BÁO] Cảm biến E08: Nhiệt độ không hợp lệ: Infinity (kiểu number)
+  Đã quét qua cảm biến E08
+  [CẢNH BÁO] Cảm biến E09: Nhiệt độ không hợp lệ: -Infinity (kiểu number)
+  Đã quét qua cảm biến E09
+  [CẢNH BÁO] Cảm biến E10: Thiếu trường bắt buộc: temp
+  Đã quét qua cảm biến E10
+  [CẢNH BÁO] Cảm biến E11: Độ ẩm không hợp lệ: 80% (kiểu string)
+  Đã quét qua cảm biến E11
+  [CẢNH BÁO] Cảm biến E12: Độ ẩm ngoài khoảng 0–100%: 120
+  Đã quét qua cảm biến E12
+  [CẢNH BÁO] Cảm biến không xác định (vị trí #12): Thiếu trường bắt buộc: id
+  Đã quét qua cảm biến không xác định (vị trí #12)
+  [CẢNH BÁO] Cảm biến không xác định (vị trí #13): Dữ liệu không phải object cảm biến (nhận được: null)
+  Đã quét qua cảm biến không xác định (vị trí #13)
+  [CẢNH BÁO] Cảm biến không xác định (vị trí #14): Dữ liệu không phải object cảm biến (nhận được: undefined)
+  Đã quét qua cảm biến không xác định (vị trí #14)
+  [CẢNH BÁO] Cảm biến không xác định (vị trí #15): Dữ liệu không phải object cảm biến (nhận được: number)
+  Đã quét qua cảm biến không xác định (vị trí #15)
+  [CẢNH BÁO] Cảm biến không xác định (vị trí #16): Dữ liệu không phải object cảm biến (nhận được: array)
+  Đã quét qua cảm biến không xác định (vị trí #16)
+  [CẢNH BÁO] Cảm biến E13: Nhiệt độ không hợp lệ: true (kiểu boolean)
+  Đã quét qua cảm biến E13
+  Cảm biến E14: Nhiệt độ là 0.0°C, độ ẩm 0%
+  Đã quét qua cảm biến E14
+  Tổng kết: 3 hợp lệ, 14 cảnh báo dữ liệu, 2 lỗi nghiệp vụ
+  --- HOÀN THÀNH XỬ LÝ DỮ LIỆU ---
+  
+  ===== DANH SÁCH SAI CẤU TRÚC =====
+  --- BẮT ĐẦU XỬ LÝ DỮ LIỆU ---
+  [LỖI] Danh sách cảm biến không phải mảng (nhận được: string)
+  --- HOÀN THÀNH XỬ LÝ DỮ LIỆU ---
+
+4. ĐỐI CHIẾU YÊU CẦU KIỂM THỬ (README mục 6)
+---------------------------------------------
+  Nhiệt độ hợp lệ                      -> S1, S3, S5, E14 hiển thị nhiệt độ       ĐẠT
+  Nhiệt độ null / undefined            -> S2, E06 cảnh báo                        ĐẠT
+  Nhiệt độ dạng chuỗi                  -> E05 cảnh báo                            ĐẠT
+  Thiếu trường bắt buộc                -> S4 (humidity), E10 (temp), id thiếu     ĐẠT
+  Nhiệt độ < -50 hoặc > 100            -> E03, E04 ném Error nghiệp vụ            ĐẠT
+  Nhiệt độ đúng ngưỡng -50 / 100       -> E01, E02 được chấp nhận                 ĐẠT
+  NaN / Infinity                       -> E07, E08, E09 cảnh báo                  ĐẠT
+  Phần tử là chuỗi hoặc null           -> chuỗi hacker, null cảnh báo             ĐẠT
+  Cảm biến hợp lệ sau cảm biến lỗi     -> S3 sau S2, S5 sau chuỗi hacker          ĐẠT
+  Kết thúc danh sách                   -> in "--- HOÀN THÀNH XỬ LÝ DỮ LIỆU ---"   ĐẠT
+
+5. DEBUG BẰNG BREAKPOINT (học viên tự thực hiện)
+------------------------------------------------
+  1. Mở Chrome, F12 > Sources > Snippets > New snippet, dán nội dung weather_dashboard.js.
+  2. Click số dòng của lệnh "if (error instanceof ValidationError)" trong khối catch
+     để đặt Breakpoint.
+  3. Nhấn Ctrl+Enter để chạy. Chương trình dừng tại catch khi gặp cảm biến S2.
+  4. Ở khung Scope, xem: error.message, error.stack, error.name, sensor, index.
+  5. Nhấn F8 (Resume) để đi tiếp tới cảm biến lỗi kế tiếp.
+  Ghi nhận: ...........................................................
+
+6. ẢNH MINH CHỨNG
+-----------------
+  screenshots/console-debug.png (học viên tự chụp: DevTools dừng tại Breakpoint
+  trong catch, thấy error.message ở khung Scope, và Console có log cảnh báo/lỗi).
