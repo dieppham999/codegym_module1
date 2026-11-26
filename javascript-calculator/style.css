@@ -1,0 +1,36 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; background: #f1f3f6; color: #202124; }
+h1 { text-align: center; margin: 24px 0 8px; }
+main { max-width: 900px; margin: 0 auto 32px; padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+@media (max-width: 760px) { main { grid-template-columns: 1fr; } }
+.card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,.07); }
+.card h2 { margin-top: 0; font-size: 18px; }
+
+/* ----- Phần cơ bản ----- */
+form { display: grid; gap: 12px; }
+label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
+input { padding: 10px; font-size: 16px; border: 1px solid #cdd3dc; border-radius: 8px; }
+.ops { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.ops button { padding: 12px; font-size: 20px; border: 0; border-radius: 8px; background: #1a73e8; color: #fff; cursor: pointer; }
+.ops button:hover { background: #1765cc; }
+.basic-result { margin: 16px 0 0; padding: 12px; border-radius: 8px; background: #f1f3f6; font-size: 18px; text-align: center; }
+.basic-result.error, .output.error { color: #d93025; }
+
+/* ----- Máy tính nâng cao ----- */
+.display { border: 1px solid #dadce0; border-radius: 10px; padding: 12px 16px; text-align: right; margin-bottom: 12px; overflow: hidden; }
+.expression { color: #70757a; font-size: 14px; min-height: 20px; word-break: break-all; }
+.output { font-size: 34px; min-height: 44px; word-break: break-all; }
+.keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.keypad button { padding: 14px 0; font-size: 18px; border: 0; border-radius: 8px; background: #f1f3f4; color: #202124; cursor: pointer; transition: background .1s; }
+.keypad button:hover { background: #e2e4e7; }
+.keypad button:active { transform: scale(.97); }
+.keypad .fn { background: #dadce0; }
+.keypad .op { background: #e8f0fe; color: #1a73e8; font-weight: 600; }
+.keypad .equals { grid-column: span 3; background: #1a73e8; color: #fff; }
+.keypad .equals:hover { background: #1765cc; }
+.hint { font-size: 12px; color: #70757a; }
+h3 { font-size: 14px; margin: 12px 0 6px; }
+.history { list-style: none; padding: 0; margin: 0; max-height: 160px; overflow-y: auto; font-size: 14px; }
+.history li { padding: 6px 8px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; gap: 8px; }
+.history li:hover { background: #f1f3f4; }
+.history li span:first-child { color: #70757a; }

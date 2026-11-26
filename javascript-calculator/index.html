@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Calculator</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <h1>JavaScript Calculator</h1>
+
+  <main>
+    <!-- ===================== PHẦN CƠ BẢN ===================== -->
+    <section class="card">
+      <h2>Máy tính 2 số</h2>
+      <form id="basicForm" novalidate>
+        <label>Số thứ nhất
+          <input type="number" id="num1" step="any" placeholder="VD: 12">
+        </label>
+        <label>Số thứ hai
+          <input type="number" id="num2" step="any" placeholder="VD: 4">
+        </label>
+        <div class="ops">
+          <button type="button" data-op="+">+</button>
+          <button type="button" data-op="-">−</button>
+          <button type="button" data-op="×">×</button>
+          <button type="button" data-op="÷">÷</button>
+        </div>
+      </form>
+      <p id="basicResult" class="basic-result" role="status">Nhập 2 số rồi chọn phép tính.</p>
+    </section>
+
+    <!-- ===================== MỞ RỘNG: MÁY TÍNH BÀN PHÍM ===================== -->
+    <section class="card">
+      <h2>Máy tính nâng cao</h2>
+      <div class="calc">
+        <div class="display">
+          <div id="expression" class="expression">&nbsp;</div>
+          <div id="output" class="output">0</div>
+        </div>
+        <div class="keypad" id="keypad">
+          <button data-key="(" class="fn">(</button>
+          <button data-key=")" class="fn">)</button>
+          <button data-key="%" class="fn">%</button>
+          <button data-key="AC" class="fn">AC</button>
+
+          <button data-key="7">7</button>
+          <button data-key="8">8</button>
+          <button data-key="9">9</button>
+          <button data-key="÷" class="op">÷</button>
+
+          <button data-key="4">4</button>
+          <button data-key="5">5</button>
+          <button data-key="6">6</button>
+          <button data-key="×" class="op">×</button>
+
+          <button data-key="1">1</button>
+          <button data-key="2">2</button>
+          <button data-key="3">3</button>
+          <button data-key="-" class="op">−</button>
+
+          <button data-key="0">0</button>
+          <button data-key=".">.</button>
+          <button data-key="CE" class="fn" title="Xóa 1 ký tự">⌫</button>
+          <button data-key="+" class="op">+</button>
+
+          <button data-key="Ans" class="fn">Ans</button>
+          <button data-key="=" class="equals">=</button>
+        </div>
+        <p class="hint">Hỗ trợ bàn phím: số, + − * /, ( ), %, Enter, Backspace, Esc</p>
+        <h3>Lịch sử</h3>
+        <ul id="history" class="history"></ul>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
