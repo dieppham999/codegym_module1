@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Currency Converter</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; font-family: system-ui, sans-serif; background: #eef2f7; color: #1f2937; }
+    .card { width: min(92vw, 420px); background: #fff; padding: 28px; border-radius: 14px; box-shadow: 0 6px 24px rgba(0,0,0,.08); }
+    h1 { margin: 0 0 20px; font-size: 22px; text-align: center; }
+    form { display: grid; gap: 14px; }
+    label { display: grid; gap: 6px; font-weight: 600; font-size: 14px; }
+    input, select { padding: 10px; font-size: 15px; border: 1px solid #cbd5e1; border-radius: 8px; }
+    .row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: end; }
+    #swapBtn { padding: 10px 12px; background: #e2e8f0; color: #1f2937; }
+    button { padding: 12px; font-size: 15px; border: 0; border-radius: 8px; background: #2563eb; color: #fff; cursor: pointer; }
+    button:hover { opacity: .9; }
+    #result { margin-top: 18px; padding: 14px; border-radius: 8px; background: #f1f5f9; text-align: center; min-height: 52px; }
+    #result.error { background: #fee2e2; color: #b91c1c; }
+    #result strong { display: block; font-size: 22px; margin-top: 4px; }
+    .note { font-size: 12px; color: #64748b; text-align: center; margin-bottom: 0; }
+  </style>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="card">
+    <h1>Currency Converter</h1>
+    <form id="converterForm" novalidate>
+      <div class="row">
+        <label>From Currency
+          <select id="fromCurrency">
+            <option value="VND">VND – Việt Nam Đồng</option>
+            <option value="USD" selected>USD – Đô la Mỹ</option>
+            <option value="EUR">EUR – Euro</option>
+            <option value="JPY">JPY – Yên Nhật</option>
+            <option value="GBP">GBP – Bảng Anh</option>
+          </select>
+        </label>
+        <button type="button" id="swapBtn" title="Đổi chiều">⇄</button>
+        <label>To Currency
+          <select id="toCurrency">
+            <option value="VND" selected>VND – Việt Nam Đồng</option>
+            <option value="USD">USD – Đô la Mỹ</option>
+            <option value="EUR">EUR – Euro</option>
+            <option value="JPY">JPY – Yên Nhật</option>
+            <option value="GBP">GBP – Bảng Anh</option>
+          </select>
+        </label>
+      </div>
+      <label>Amount
+        <input type="number" id="amount" min="0" step="any" placeholder="Nhập số tiền">
+      </label>
+      <button type="submit">Convert</button>
+    </form>
+    <div id="result" role="status">Kết quả sẽ hiển thị tại đây.</div>
+    <p class="note">Tỷ giá cho trước (cố định), không phải tỷ giá thời gian thực.</p>
+  </main>
+</body>
+</html>
