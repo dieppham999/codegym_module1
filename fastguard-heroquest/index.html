@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HeroQuest – FastGuard</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background: #14161f; color: #eee; }
+    header { padding: 24px; text-align: center; background: #222638; }
+    main { max-width: 720px; margin: 24px auto; padding: 0 16px; }
+    #status { padding: 12px 16px; border-radius: 8px; background: #2c3048; }
+    #status.denied { background: #5a2330; }
+    #status.granted { background: #1f4a33; }
+    #game-content { margin-top: 24px; padding: 16px; border: 1px solid #444; border-radius: 8px; }
+    [hidden] { display: none !important; }
+    button { margin-top: 12px; padding: 8px 16px; cursor: pointer; }
+  </style>
+  <!-- External JS + defer: tải song song, chạy sau khi HTML phân tích xong -->
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>HeroQuest</h1>
+    <p>Cổng an ninh FastGuard</p>
+  </header>
+  <main>
+    <p id="status">Đang chờ xác thực người chơi...</p>
+    <button id="retry" type="button" hidden>Thử lại</button>
+
+    <!-- Nội dung game bị ẩn cho tới khi người chơi xác nhận đủ 18 tuổi -->
+    <section id="game-content" hidden>
+      <h2 id="welcome"></h2>
+      <p>Hành trình của bạn bắt đầu tại Làng Sương Mù. Hãy chọn vũ khí và tiến vào hầm ngục!</p>
+      <ul>
+        <li>Kiếm sắt</li>
+        <li>Cung gỗ</li>
+        <li>Gậy phép</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
