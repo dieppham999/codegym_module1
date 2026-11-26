@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khai báo và sử dụng biến</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; line-height: 1.6; }
+    h2 { border-bottom: 2px solid #ddd; padding-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <h1>[Thực hành] Khai báo và sử dụng biến</h1>
+
+  <!-- ===================== BÀI 1 ===================== -->
+  <h2>Bài 1: Khai báo và sử dụng các kiểu dữ liệu</h2>
+  <script>
+    let i = 10;          // số nguyên
+    let f = 20.5;        // số thực
+    let b = true;        // logic
+    let s = "Hà Nội";    // chuỗi
+
+    document.write("i = " + i + " (kiểu " + typeof i + ")<br>");
+    document.write("f = " + f + " (kiểu " + typeof f + ")<br>");
+    document.write("b = " + b + " (kiểu " + typeof b + ")<br>");
+    document.write("s = " + s + " (kiểu " + typeof s + ")<br>");
+  </script>
+
+  <!-- ===================== BÀI 2 ===================== -->
+  <h2>Bài 2: Tính diện tích hình chữ nhật</h2>
+  <script>
+    let width = 20;
+    let height = 10;
+    let area = width * height;
+
+    document.write("Chiều rộng: " + width + "<br>");
+    document.write("Chiều cao: " + height + "<br>");
+    document.write("Diện tích hình chữ nhật: " + area + "<br>");
+  </script>
+
+  <!-- ===================== BÀI 3 ===================== -->
+  <h2>Bài 3: Kiểm tra bội số</h2>
+  <p>Nhập 2 số trong hộp thoại, kết quả hiển thị bằng <code>alert()</code>. Tải lại trang (F5) để thử lại.</p>
+  <script>
+    function checkMultiple() {
+      let inputA = prompt("Nhập số a:");
+      if (inputA === null) return alert("Bạn đã hủy nhập.");
+      let inputB = prompt("Nhập số b:");
+      if (inputB === null) return alert("Bạn đã hủy nhập.");
+
+      // prompt() luôn trả về chuỗi -> chuyển sang số
+      let a = Number(inputA);
+      let b = Number(inputB);
+
+      if (inputA.trim() === "" || inputB.trim() === "" || isNaN(a) || isNaN(b)) {
+        alert("Vui lòng nhập số hợp lệ.");
+      } else if (b === 0) {
+        alert("Không thể kiểm tra bội số của 0 (không chia được cho 0).");
+      } else if (a % b === 0) {
+        alert(a + " là bội số của " + b);
+      } else {
+        alert(a + " không phải là bội số của " + b);
+      }
+    }
+
+    // Đợi trang hiển thị Bài 1 và Bài 2 xong rồi mới mở hộp thoại
+    window.addEventListener("load", () => setTimeout(checkMultiple, 100));
+  </script>
+</body>
+</html>
