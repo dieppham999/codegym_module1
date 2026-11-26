@@ -8,6 +8,10 @@ const ERROR_RATE = 0.3;
 
 // ===================== VALIDATION =====================
 
+// Mô tả giá trị kèm kiểu để cảnh báo rõ ràng, ví dụ: "310" (string), [300] (array)
+const describe = (v) =>
+  v === null ? "null" : Array.isArray(v) ? `[${v}] (array)` : typeof v === "string" ? `"${v}" (string)` : `${String(v)} (${typeof v})`;
+
 const isValidCoord = (v) => typeof v === "number" && Number.isFinite(v); // loại null, undefined, NaN, Infinity, chuỗi
 
 /**
@@ -28,12 +32,12 @@ function cleanData(raw) {
     // try...catch BÊN TRONG vòng lặp: lỗi của 1 phần tử không ảnh hưởng phần tử khác
     try {
       if (item === null || typeof item !== "object" || Array.isArray(item)) {
-        throw new TypeError(`phần tử không phải object (${item === null ? "null" : typeof item})`);
+        throw new TypeError(`phần tử không phải object: ${describe(item)}`);
       }
       const { id, x, y } = item;
       if (typeof id !== "string" && typeof id !== "number") throw new TypeError("thiếu hoặc sai kiểu id");
       if (!("x" in item) || !("y" in item)) throw new TypeError("thiếu tọa độ x/y");
-      if (!isValidCoord(x) || !isValidCoord(y)) throw new RangeError(`tọa độ không hợp lệ x=${String(x)}, y=${String(y)}`);
+      if (!isValidCoord(x) || !isValidCoord(y)) throw new RangeError(`tọa độ không hợp lệ x=${describe(x)}, y=${describe(y)}`);
       if (Math.hypot(x - CENTER, y - CENTER) > RADAR_R) throw new RangeError(`ngoài phạm vi radar (${x.toFixed(1)}, ${y.toFixed(1)})`);
 
       planes.push({ id: String(id), x, y });

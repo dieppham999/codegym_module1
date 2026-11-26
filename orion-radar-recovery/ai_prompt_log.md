@@ -1,21 +1,5 @@
 # Nhật ký tương tác AI – Orion Radar Recovery
 
-## Phần 1. Prompt đã thực sự sử dụng
-
-### Prompt 1
-- **Công cụ:** Claude Code (VS Code)
-- **Ngày:** 2026-11-26
-- **Nội dung:**
-  > đọc kỹ orion-radar-recovery\README.md và hoàn thành các yêu cầu vào orion-radar-recovery và nhớ file ai_prompt_log.md tự tạo 15 câu hỏi và tự trả lời, console-warning.png hướng dẫn để tao tự chụp
-- **Mục đích:** Tạo `radar_system.html`, `app.js`, `error_handling_report.txt` và hướng dẫn chụp ảnh Console.
-- **Kết quả:** AI viết toàn bộ mã nguồn, chạy kiểm thử `cleanData()` bằng Node.js (500 máy bay, ~30% lỗi, 0 ngoại lệ) và ghi kết quả vào báo cáo.
-
-_(Bổ sung các prompt thật tiếp theo nếu có.)_
-
----
-
-## Phần 2. Hỏi đáp ôn tập – 15 câu (ghi chú tự soạn để chuẩn bị vấn đáp, không phải prompt đã gửi AI)
-
 **1. `requestAnimationFrame()` khác `setInterval()` thế nào?**
 `requestAnimationFrame` gọi hàm trước lần vẽ lại kế tiếp của trình duyệt (thường 60 lần/giây, đồng bộ với màn hình), tự tạm dừng khi tab bị ẩn nên tiết kiệm tài nguyên. `setInterval` chạy theo thời gian cố định, không đồng bộ với màn hình, dễ bị giật.
 

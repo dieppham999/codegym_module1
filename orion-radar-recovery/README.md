@@ -22,6 +22,7 @@ orion-radar-recovery/
 ├── app.js
 ├── README.md
 ├── error_handling_report.txt
+├── test_data_errors.json
 ├── ai_prompt_log.md
 └── screenshots/
     └── console-warning.png
@@ -64,4 +65,4 @@ AI được sử dụng để sinh dữ liệu kiểm thử, giải thích công
 
 ## Trạng thái
 
-Đang phát triển. Các mục bàn giao và kết quả kiểm thử sẽ được cập nhật sau khi triển khai thực tế.
+Đã triển khai mã nguồn. Đã kiểm thử `cleanData()` bằng Node.js (bộ JSON lỗi 23 phần tử và stress 100 lượt × 500 máy bay, 0 ngoại lệ). Còn chờ: kiểm thử trên trình duyệt (mục 4.2 trong `error_handling_report.txt`) và ảnh `screenshots/console-warning.png`.

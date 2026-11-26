@@ -45,6 +45,65 @@ Dữ liệu stress: 500 máy bay, mỗi phần tử có xác suất 30% bị là
 bằng 1 trong 14 kiểu lỗi (null, undefined, NaN, ±Infinity, chuỗi, thiếu id, thiếu y,
 mảng, số, ngoài phạm vi...).
 
+3b. BỘ DỮ LIỆU JSON LỖI (file test_data_errors.json, 23 phần tử, do AI sinh)
+--------------------------------------------------------------------------
+Lưu ý: JSON không biểu diễn được NaN, Infinity, undefined. Khi API trả JSON, các giá
+trị này thường thành null hoặc chuỗi "NaN"/"Infinity"; 1e309 khi JSON.parse sẽ thành
+Infinity. Vì vậy bộ dữ liệu dưới đây dùng đúng các dạng lỗi có thể xuất hiện thực tế.
+
+[
+  { "id": "OR-001", "x": 300, "y": 300 },
+  null,
+  { "id": "OR-002", "x": null, "y": 250 },
+  { "id": "OR-003", "x": "NaN", "y": 120 },
+  { "id": "OR-004", "x": 200, "y": "Infinity" },
+  { "id": "OR-005", "x": "310", "y": 280 },
+  { "id": "OR-006", "x": 150 },
+  { "id": "OR-007" },
+  { "x": 320, "y": 330 },
+  { "id": null, "x": 300, "y": 300 },
+  { "id": { "code": "OR-008" }, "x": 300, "y": 300 },
+  { "id": "OR-009", "x": true, "y": 300 },
+  { "id": "OR-010", "position": { "x": 300, "y": 300 } },
+  { "id": "OR-011", "x": [300], "y": 300 },
+  { "id": "OR-012", "x": 1e309, "y": 300 },
+  { "id": "OR-013", "x": -5000, "y": 300 },
+  [310, 290],
+  "OR-014",
+  42,
+  true,
+  {},
+  { "id": 15, "x": 420.5, "y": 180.25 },
+  { "id": "OR-016", "x": 250, "y": 350, "altitude": "unknown" }
+]
+
+Kết quả chạy cleanData(JSON.parse(...)) bằng Node.js (đã chạy thực tế, 2026-11-26):
+  Tổng 23 -> hợp lệ 3 (OR-001, 15, OR-016), bị loại 20, không ném lỗi.
+  #1  null                         -> phần tử không phải object: null
+  #2  x: null                      -> tọa độ không hợp lệ x=null
+  #3  x: "NaN"                     -> tọa độ không hợp lệ x="NaN" (string)
+  #4  y: "Infinity"                -> tọa độ không hợp lệ y="Infinity" (string)
+  #5  x: "310"                     -> tọa độ không hợp lệ x="310" (string)
+  #6  thiếu y                      -> thiếu tọa độ x/y
+  #7  thiếu x và y                 -> thiếu tọa độ x/y
+  #8  thiếu id                     -> thiếu hoặc sai kiểu id
+  #9  id: null                     -> thiếu hoặc sai kiểu id
+  #10 id là object                 -> thiếu hoặc sai kiểu id
+  #11 x: true                      -> tọa độ không hợp lệ x=true (boolean)
+  #12 tọa độ lồng trong position   -> thiếu tọa độ x/y
+  #13 x: [300]                     -> tọa độ không hợp lệ x=[300] (array)
+  #14 x: 1e309                     -> tọa độ không hợp lệ x=Infinity (number)
+  #15 x: -5000                     -> ngoài phạm vi radar
+  #16 [310, 290]                   -> phần tử không phải object (array)
+  #17 "OR-014"                     -> phần tử không phải object (string)
+  #18 42                           -> phần tử không phải object (number)
+  #19 true                         -> phần tử không phải object (boolean)
+  #20 {}                           -> thiếu hoặc sai kiểu id
+  #22 có thêm trường altitude lạ   -> HỢP LỆ (trường thừa được bỏ qua)
+
+Cách chạy lại trên trình duyệt: mở radar_system.html, F12 > Console, dán nội dung
+test_data_errors.json vào lệnh:  cleanData( <dán mảng JSON> )
+
 4. KẾT QUẢ KIỂM THỬ
 -------------------
 4.1. Kiểm thử hàm cleanData bằng Node.js (đã chạy thực tế, 2026-11-26):
@@ -54,7 +113,7 @@ mảng, số, ngoài phạm vi...).
   {data:[]}         -> hợp lệ 0, không ném lỗi
   404               -> hợp lệ 0, không ném lỗi
   Mảng hỗn hợp 13   -> hợp lệ 2 (A, 7), bị loại 11 -> đúng kỳ vọng
-  Stress 100 lượt x 500 máy bay -> trung bình hợp lệ 351.2, bị loại 148.8 (~29.8%),
+  Stress 100 lượt x 500 máy bay -> trung bình hợp lệ 348.4, bị loại 151.6 (~30.3%),
                                    số ngoại lệ không xử lý: 0
 
 4.2. Kiểm thử trên trình duyệt (học viên tự chạy và điền kết quả):
